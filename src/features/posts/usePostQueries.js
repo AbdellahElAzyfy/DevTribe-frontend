@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../../lib/queryKeys";
-import { useFeed, usePost } from "../../hooks/usePostQueries";
+import { useFeed, useListPosts, usePost } from "../../hooks/usePostQueries";
 import apiClient from "../../services/apiClient";
 import { toggleSavePost } from "../../services/apiPosts";
 
@@ -25,8 +25,8 @@ export function useFeedPostsQuery(params = { sortBy: "newest" }, options = {}) {
   return useFeed(params, options);
 }
 
-export function usePopularPostsQuery(options = {}) {
-  return useFeed({ sortBy: "top" }, options);
+export function usePopularPostsQuery(params = { sortBy: "hot" }, options = {}) {
+  return useListPosts(params, options);
 }
 
 export function usePostByIdQuery(id, options = {}) {
