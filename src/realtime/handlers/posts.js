@@ -96,25 +96,32 @@ export function register(socket, { queryClient, currentUserId }) {
   const onVoted = ({ vote, actorId }) => {
     if (isSelf(actorId)) return;
     const postId = vote?.postId ?? vote?.targetId;
-    const delta = Number(vote?.delta ?? vote?.value ?? 0);
     if (!postId) return;
+
+    // Prefer the server's authoritative voteCount; fall back to a delta nudge
+    // for legacy payloads that don't carry it. The value-as-delta fallback is
+    // wrong for toggle-off (value=0) and side-switch (value=±1, delta=±2),
+    // but kept so older servers degrade gracefully.
+    const hasVoteCount = vote?.voteCount != null;
+    const nextVoteCount = hasVoteCount ? Number(vote.voteCount) : null;
+    const delta = Number(vote?.delta ?? vote?.value ?? 0);
+
+    const applyPatch = (p) => {
+      const current = Number(p.voteCount ?? 0);
+      const next = hasVoteCount
+        ? nextVoteCount
+        : Number.isFinite(delta) && delta !== 0
+          ? current + delta
+          : current;
+      return { ...p, voteCount: next };
+    };
 
     queryClient.setQueryData(queryKeys.posts.detail(postId), (prev) => {
       if (!prev) return prev;
-      const currentCount = Number(prev.voteCount ?? 0);
-      const nextCount = Number.isFinite(delta) && delta !== 0 ? currentCount + delta : currentCount;
-      return { ...prev, voteCount: nextCount };
+      return applyPatch(prev);
     });
 
-    patchPostInLists(
-      queryClient,
-      (p) => sameId(p, postId),
-      (p) => {
-        const currentCount = Number(p.voteCount ?? 0);
-        const nextCount = Number.isFinite(delta) && delta !== 0 ? currentCount + delta : currentCount;
-        return { ...p, voteCount: nextCount };
-      },
-    );
+    patchPostInLists(queryClient, (p) => sameId(p, postId), applyPatch);
   };
 
   socket.on("post:created", onCreated);

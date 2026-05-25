@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   useToggleSavedPostMutation,
   useVotePostMutation,
@@ -33,8 +33,7 @@ export default function PostCard({ post }) {
   const safeImageUrl = resolveImageUrl(imageUrl || image);
   const normalizedVotes = Number(voteCount ?? votes ?? 0);
   const safeVoteCount = Number.isFinite(normalizedVotes) ? normalizedVotes : 0;
-  const [currentUserVote, setCurrentUserVote] = useState(post.userVote ?? 0);
-  const [fakeVotes, setFakeVotes] = useState(safeVoteCount);
+  const userVote = Number(post.userVote ?? 0);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const [visibleCommentsCount, setVisibleCommentsCount] = useState(
     INITIAL_VISIBLE_COMMENTS,
@@ -45,13 +44,8 @@ export default function PostCard({ post }) {
   const isTogglingSavedState =
     toggleSavedPostMutation.isPending &&
     Number(toggleSavedPostMutation.variables) === post.id;
-  
-  const comments = post.comments ?? [];
 
-  useEffect(() => {
-    setFakeVotes(safeVoteCount);
-    setCurrentUserVote(post.userVote ?? 0);
-  }, [safeVoteCount, post.userVote]);
+  const comments = post.comments ?? [];
 
   const handleToggleComments = () => {
     setIsCommentsOpen((prev) => {
@@ -64,33 +58,7 @@ export default function PostCard({ post }) {
 
   const handleVote = (value) => {
     if (votePostMutation.isPending) return;
-
-    let delta = 0;
-    let nextVote = 0;
-
-    if (currentUserVote === value) {
-      delta = -value;
-      nextVote = 0;
-    } else {
-      delta = value - currentUserVote;
-      nextVote = value;
-    }
-
-    const previousVotes = fakeVotes;
-    const previousUserVote = currentUserVote;
-
-    setFakeVotes((prev) => prev + delta);
-    setCurrentUserVote(nextVote);
-
-    votePostMutation.mutate(
-      { postId: post.id, value },
-      {
-        onError: () => {
-          setFakeVotes(previousVotes);
-          setCurrentUserVote(previousUserVote);
-        },
-      },
-    );
+    votePostMutation.mutate({ postId: post.id, value });
   };
 
   return (
@@ -115,11 +83,11 @@ export default function PostCard({ post }) {
           />
 
           <PostCardActions
-            fakeVotes={fakeVotes}
-            userVote={currentUserVote}
+            fakeVotes={safeVoteCount}
+            userVote={userVote}
             onUpvote={() => handleVote(1)}
             onDownvote={() => handleVote(-1)}
-            canDownvote={fakeVotes > 0}
+            canDownvote={true}
             isVoting={votePostMutation.isPending}
             commentsCount={commentsCount ?? commentCount ?? comments.length}
             onToggleComments={handleToggleComments}

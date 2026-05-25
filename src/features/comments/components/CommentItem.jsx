@@ -32,8 +32,10 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
   const hasReplies = replies.length > 0;
   const canNest = depth < MAX_NESTING_DEPTH;
 
+  const isVoteDisabled = !isAuthenticated || voteCommentMutation.isPending;
+
   const handleVote = (value) => {
-    if (!isAuthenticated || voteCommentMutation.isPending) return;
+    if (isVoteDisabled) return;
     voteCommentMutation.mutate({ postId, commentId: comment.id, value });
   };
 
@@ -67,12 +69,12 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
                 type="button"
                 onClick={() => handleVote(1)}
                 aria-label="Upvote comment"
-                disabled={!isAuthenticated || voteCommentMutation.isPending}
+                disabled={isVoteDisabled}
                 className={`inline-flex items-center justify-center px-2 py-1 transition-colors ${
                   isUpvoted
                     ? "bg-blue-600/25 text-blue-400"
                     : "text-slate-400 hover:bg-slate-800/80 hover:text-blue-300"
-                } ${!isAuthenticated || voteCommentMutation.isPending ? "cursor-not-allowed opacity-60" : ""}`}
+                } ${isVoteDisabled ? "cursor-not-allowed opacity-60" : ""}`}
               >
                 <FaArrowUp className="h-3 w-3" />
               </button>
@@ -91,12 +93,12 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
                 type="button"
                 onClick={() => handleVote(-1)}
                 aria-label="Downvote comment"
-                disabled={!isAuthenticated || voteCommentMutation.isPending}
+                disabled={isVoteDisabled}
                 className={`inline-flex items-center justify-center px-2 py-1 transition-colors ${
                   isDownvoted
                     ? "bg-rose-500/20 text-rose-400"
                     : "text-slate-400 hover:bg-slate-800/80 hover:text-rose-300"
-                } ${!isAuthenticated || voteCommentMutation.isPending ? "cursor-not-allowed opacity-60" : ""}`}
+                } ${isVoteDisabled ? "cursor-not-allowed opacity-60" : ""}`}
               >
                 <FaArrowDown className="h-3 w-3" />
               </button>

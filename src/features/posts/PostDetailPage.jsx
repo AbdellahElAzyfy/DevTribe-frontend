@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   FaArrowLeft,
@@ -36,16 +36,6 @@ export default function PostDetailPage() {
   const createCommentMutation = useCreateComment();
   const votePostMutation = useVotePostMutation();
   const toggleSavedPostMutation = useToggleSavedPostMutation();
-
-  const [fakeVotes, setFakeVotes] = useState(0);
-  const [currentUserVote, setCurrentUserVote] = useState(0);
-
-  useEffect(() => {
-    if (post) {
-      setFakeVotes(post.voteCount ?? 0);
-      setCurrentUserVote(post.userVote ?? 0);
-    }
-  }, [post]);
 
   const scrollToDiscussion = () => {
     const element = document.getElementById("discussion-section");
@@ -96,34 +86,11 @@ export default function PostDetailPage() {
 
   const handleVote = (value) => {
     if (votePostMutation.isPending) return;
-
-    let delta = 0;
-    let nextVote = 0;
-
-    if (currentUserVote === value) {
-      delta = -value;
-      nextVote = 0;
-    } else {
-      delta = value - currentUserVote;
-      nextVote = value;
-    }
-
-    const previousVotes = fakeVotes;
-    const previousUserVote = currentUserVote;
-
-    setFakeVotes((prev) => prev + delta);
-    setCurrentUserVote(nextVote);
-
-    votePostMutation.mutate(
-      { postId: post.id, value },
-      {
-        onError: () => {
-          setFakeVotes(previousVotes);
-          setCurrentUserVote(previousUserVote);
-        },
-      }
-    );
+    votePostMutation.mutate({ postId: post.id, value });
   };
+
+  const voteCount = Number(post.voteCount ?? 0);
+  const userVote = Number(post.userVote ?? 0);
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
@@ -223,8 +190,8 @@ export default function PostDetailPage() {
 
           {/* Actions */}
           <PostCardActions
-            fakeVotes={fakeVotes}
-            userVote={currentUserVote}
+            fakeVotes={voteCount}
+            userVote={userVote}
             onUpvote={() => handleVote(1)}
             onDownvote={() => handleVote(-1)}
             canDownvote={true}
@@ -296,18 +263,18 @@ export default function PostDetailPage() {
         <div className="flex items-center gap-3 rounded-2xl border border-slate-700/80 bg-slate-900/80 p-2 shadow-2xl shadow-black/60 backdrop-blur-xl ring-1 ring-white/5">
           {/* Vote Group */}
           <div className="flex items-center rounded-xl bg-slate-950/50 p-1 border border-slate-800/50">
-            <button 
+            <button
               onClick={() => handleVote(1)}
-              className={`p-2 transition-colors ${currentUserVote === 1 ? "text-blue-400" : "text-slate-500 hover:text-blue-300"}`}
+              className={`p-2 transition-colors ${userVote === 1 ? "text-blue-400" : "text-slate-500 hover:text-blue-300"}`}
             >
               <FaArrowUp className="h-4 w-4" />
             </button>
-            <span className={`px-2 text-xs font-bold ${currentUserVote === 1 ? "text-blue-400" : currentUserVote === -1 ? "text-rose-400" : "text-slate-200"}`}>
-              {fakeVotes}
+            <span className={`px-2 text-xs font-bold ${userVote === 1 ? "text-blue-400" : userVote === -1 ? "text-rose-400" : "text-slate-200"}`}>
+              {voteCount}
             </span>
-            <button 
+            <button
               onClick={() => handleVote(-1)}
-              className={`p-2 transition-colors ${currentUserVote === -1 ? "text-rose-400" : "text-slate-500 hover:text-rose-300"}`}
+              className={`p-2 transition-colors ${userVote === -1 ? "text-rose-400" : "text-slate-500 hover:text-rose-300"}`}
             >
               <FaArrowDown className="h-4 w-4" />
             </button>
