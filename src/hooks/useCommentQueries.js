@@ -21,7 +21,7 @@ export function useListComments(postId, params = {}, options = {}) {
 }
 
 /**
- * Mutation: Create comment on post
+ * Mutation: Create comment on post (also used for replies via parentCommentId)
  * @param {Object} options - useMutation options
  * @returns {UseMutationResult}
  */
@@ -31,7 +31,6 @@ export function useCreateComment(options = {}) {
   return useMutation({
     mutationFn: ({ postId, data }) => commentsApi.createComment(postId, data),
     onSuccess: (data, { postId }, context) => {
-      // Invalidate comments list for the post
       // Invalidate ALL comments list variants for this specific post
       queryClient.invalidateQueries({
         queryKey: ["comments", "list", "byPost", String(postId)],
@@ -105,7 +104,11 @@ export function useDeleteComment(options = {}) {
 }
 
 /**
- * Mutation: Vote on comment (with optimistic updates)
+ * Mutation: Vote on a comment (toggle semantics, optimistic).
+ *
+ * Backend contract: POST /comments/:id/vote with { value: 1 | -1 }.
+ * Re-sending the same value clears the vote (server returns value: 0).
+ *
  * @param {Object} options - useMutation options
  * @returns {UseMutationResult}
  */
@@ -115,65 +118,69 @@ export function useVoteComment(options = {}) {
   return useMutation({
     mutationFn: ({ commentId, value }) =>
       votesApi.voteComment(commentId, { value }),
-    onMutate: ({ commentId, value }) => {
-      // Save previous state for rollback
-      const previousComment = queryClient.getQueryData(
-        queryKeys.comments.detail(commentId),
-      );
+    onMutate: async ({ postId, commentId, value }) => {
+      const listKey = ["comments", "list", "byPost", String(postId)];
 
-      if (previousComment) {
-        // Optimistic update
-        const updatedComment = {
-          ...previousComment,
-          votes: {
-            ...previousComment.votes,
-            userVote: value,
-            upvotes:
-              value === "up"
-                ? previousComment.votes.upvotes + 1
-                : value === null && previousComment.votes.userVote === "up"
-                  ? previousComment.votes.upvotes - 1
-                  : previousComment.votes.upvotes,
-            downvotes:
-              value === "down"
-                ? previousComment.votes.downvotes + 1
-                : value === null && previousComment.votes.userVote === "down"
-                  ? previousComment.votes.downvotes - 1
-                  : previousComment.votes.downvotes,
-          },
-        };
+      await queryClient.cancelQueries({ queryKey: listKey });
 
-        queryClient.setQueryData(
-          queryKeys.comments.detail(commentId),
-          updatedComment,
-        );
-      }
+      const snapshots = queryClient.getQueriesData({ queryKey: listKey });
 
-      return { previousComment };
-    },
-    onError: (error, { commentId }, context) => {
-      // Rollback on error
-      if (context?.previousComment) {
-        queryClient.setQueryData(
-          queryKeys.comments.detail(commentId),
-          context.previousComment,
-        );
-      }
-      options.onError?.(error, { commentId }, context);
-    },
-    onSuccess: (data, { commentId }, context) => {
-      // Invalidate comment detail to sync with server
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.comments.detail(commentId),
+      queryClient.setQueriesData({ queryKey: listKey }, (oldData) => {
+        if (!oldData || !Array.isArray(oldData.comments)) return oldData;
+
+        const nextComments = oldData.comments.map((comment) => {
+          if (String(comment.id) !== String(commentId)) return comment;
+
+          const currentUserVote = Number(comment.userVote ?? 0);
+          const nextUserVote = currentUserVote === value ? 0 : value;
+          const voteDelta = nextUserVote - currentUserVote;
+          const nextVoteCount = Number(comment.voteCount ?? 0) + voteDelta;
+
+          return {
+            ...comment,
+            userVote: nextUserVote,
+            voteCount: nextVoteCount,
+          };
+        });
+
+        return { ...oldData, comments: nextComments };
       });
 
-      // Invalidate comments lists
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.comments.lists(),
-      });
-
-      options.onSuccess?.(data, { commentId }, context);
+      return { snapshots };
     },
-    ...options,
+    onError: (error, variables, context) => {
+      if (context?.snapshots) {
+        context.snapshots.forEach(([key, data]) => {
+          queryClient.setQueryData(key, data);
+        });
+      }
+      options.onError?.(error, variables, context);
+    },
+    onSuccess: (data, { postId, commentId }, context) => {
+      // Reconcile with the server's authoritative voteCount and value.
+      // Note: we intentionally do not invalidate the comments list — the
+      // backend's list response doesn't carry `userVote`, so a refetch would
+      // erase the client-tracked vote highlight.
+      const serverVote = data?.vote;
+      if (serverVote && postId) {
+        const listKey = ["comments", "list", "byPost", String(postId)];
+        queryClient.setQueriesData({ queryKey: listKey }, (oldData) => {
+          if (!oldData || !Array.isArray(oldData.comments)) return oldData;
+          const nextComments = oldData.comments.map((comment) => {
+            if (String(comment.id) !== String(commentId)) return comment;
+            return {
+              ...comment,
+              userVote: Number(serverVote.value ?? 0),
+              voteCount:
+                serverVote.voteCount != null
+                  ? Number(serverVote.voteCount)
+                  : comment.voteCount,
+            };
+          });
+          return { ...oldData, comments: nextComments };
+        });
+      }
+      options.onSuccess?.(data, { postId, commentId }, context);
+    },
   });
 }

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import CommentItem from "../../comments/components/CommentItem";
 import CommentInput from "../../comments/components/CommentInput";
+import buildCommentTree from "../../comments/buildCommentTree";
 import { useListComments } from "../../../hooks/useCommentQueries";
 
 function PostCardComments({ postId, initialVisibleCount = 2 }) {
@@ -10,6 +11,7 @@ function PostCardComments({ postId, initialVisibleCount = 2 }) {
   const comments = commentsData?.comments || [];
   const totalComments = commentsData?.total || 0;
   const hasMore = totalComments > comments.length;
+  const commentTree = useMemo(() => buildCommentTree(comments), [comments]);
 
   return (
     <div className="mt-4 space-y-4 border-t border-slate-700/50 pt-4">
@@ -22,9 +24,13 @@ function PostCardComments({ postId, initialVisibleCount = 2 }) {
           <div className="flex justify-center py-2">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
           </div>
-        ) : comments.length > 0 ? (
-          comments.map((comment) => (
-            <CommentItem key={`${postId}-${comment.id}`} comment={comment} />
+        ) : commentTree.length > 0 ? (
+          commentTree.map((comment) => (
+            <CommentItem
+              key={`${postId}-${comment.id}`}
+              comment={comment}
+              postId={postId}
+            />
           ))
         ) : (
           <p className="rounded-lg border border-slate-700/70 bg-slate-900/40 px-3 py-2 text-sm text-slate-400">

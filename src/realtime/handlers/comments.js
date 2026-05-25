@@ -91,8 +91,13 @@ export function register(socket, { queryClient, currentUserId }) {
     if (isSelf(actorId)) return;
     const commentId = vote?.targetId;
     const postId = vote?.postId;
-    const delta = Number(vote?.delta ?? vote?.value ?? 0);
     if (!commentId || !postId) return;
+
+    // Prefer the server's authoritative voteCount; fall back to a delta nudge
+    // for legacy payloads that don't carry it.
+    const hasVoteCount = vote?.voteCount != null;
+    const nextVoteCount = hasVoteCount ? Number(vote.voteCount) : null;
+    const delta = Number(vote?.delta ?? vote?.value ?? 0);
 
     findCommentLists(queryClient, postId).forEach((q) => {
       queryClient.setQueryData(q.queryKey, (prev) => {
@@ -101,7 +106,11 @@ export function register(socket, { queryClient, currentUserId }) {
           arr.map((c) => {
             if (idOf(c) !== String(commentId)) return c;
             const current = Number(c.voteCount ?? 0);
-            const next = Number.isFinite(delta) && delta !== 0 ? current + delta : current;
+            const next = hasVoteCount
+              ? nextVoteCount
+              : Number.isFinite(delta) && delta !== 0
+                ? current + delta
+                : current;
             return { ...c, voteCount: next };
           });
         if (Array.isArray(prev)) return patch(prev);

@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { 
-  FaArrowLeft, 
-  FaRegMessage, 
+import {
+  FaArrowLeft,
+  FaRegMessage,
   FaPaperPlane,
   FaClock,
   FaHashtag,
@@ -15,6 +15,7 @@ import { usePostByIdQuery, useVotePostMutation, useToggleSavedPostMutation } fro
 import { useListComments, useCreateComment } from "../../hooks/useCommentQueries";
 import PostCardActions from "./components/PostCardActions";
 import CommentItem from "../comments/components/CommentItem";
+import buildCommentTree from "../comments/buildCommentTree";
 import PageShell from "../../ui/PageShell";
 import ContentRenderer from "../../ui/ContentRenderer";
 import resolveImageUrl from "../../utils/resolveImageUrl";
@@ -139,6 +140,7 @@ export default function PostDetailPage() {
   };
 
   const comments = commentsResponse?.comments || [];
+  const commentTree = buildCommentTree(comments);
   const safeImageUrl = resolveImageUrl(post.imageUrl || post.image);
   
   const postAuthorAvatar = resolveImageUrl(post.author.avatar) || 
@@ -273,9 +275,13 @@ export default function PostDetailPage() {
               <div className="h-32 rounded-2xl bg-slate-800/30 animate-pulse" />
               <div className="h-32 rounded-2xl bg-slate-800/30 animate-pulse" />
             </div>
-          ) : comments.length > 0 ? (
-            comments.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} />
+          ) : commentTree.length > 0 ? (
+            commentTree.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                postId={post.id}
+              />
             ))
           ) : (
             <div className="py-12 text-center border-2 border-dashed border-slate-800 rounded-3xl">
