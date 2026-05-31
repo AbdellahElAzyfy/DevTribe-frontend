@@ -15,8 +15,16 @@ let setAccessToken = () => {};
 let onUnauthorized = () => {};
 let refreshPromise = null;
 
-function isAuthRefreshPath(url = "") {
-  return url.includes("/auth/refresh");
+// A 401 from these endpoints means bad/absent credentials, not an expired
+// access token, so it must NOT trigger the token-refresh retry. Otherwise a
+// failed login surfaces the refresh endpoint's "Refresh token is required"
+// error instead of the real "Invalid credentials" message.
+function isAuthEntryPath(url = "") {
+  return (
+    url.includes("/auth/refresh") ||
+    url.includes("/auth/login") ||
+    url.includes("/auth/register")
+  );
 }
 
 function isRetryable401(error) {
@@ -27,7 +35,7 @@ function isRetryable401(error) {
     return false;
   }
 
-  if (isAuthRefreshPath(url)) {
+  if (isAuthEntryPath(url)) {
     return false;
   }
 
