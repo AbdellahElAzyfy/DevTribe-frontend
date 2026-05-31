@@ -5,17 +5,15 @@ import { useForm } from "@tanstack/react-form";
 import CreatePostForm from "./components/CreatePostForm";
 import DraftPreview from "./components/DraftPreview";
 import PageShell from "../../ui/PageShell";
-import {
-  useJoinCommunity,
-  useListCommunities,
-} from "../../hooks/useCommunityQueries";
+import { useListCommunities } from "../../hooks/useCommunityQueries";
 import { useCreatePost } from "../../hooks/usePostQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import AsyncStateNotice from "../../ui/AsyncStateNotice";
+import EmptyStateCard from "../../ui/EmptyStateCard";
 
 const INITIAL_VALUES = {
   title: "",
-  communitySlug: "reactjs",
+  communitySlug: "",
   content: "",
   codeSnippet: "",
   tagsInput: "",
@@ -49,7 +47,11 @@ export default function CreatePostPage() {
   const [submitError, setSubmitError] = useState("");
 
   const { data: communities = [] } = useListCommunities();
-  const joinCommunity = useJoinCommunity();
+
+  // Users can only post in communities they have joined.
+  const joinedCommunities = communities.filter(
+    (community) => community.isJoined,
+  );
 
   const createPost = useCreatePost({
     onSuccess: async (data) => {
@@ -112,7 +114,6 @@ export default function CreatePostPage() {
           };
 
       try {
-        await joinCommunity.mutateAsync(value.communitySlug);
         await createPost.mutateAsync(payload);
       } catch (error) {
         setSubmitError(
@@ -137,16 +138,32 @@ export default function CreatePostPage() {
           }
         />
       )}
-      <CreatePostForm
-        formApi={form}
-        communitiesList={communities}
-        isSubmitting={createPost.isPending || joinCommunity.isPending}
-        onSubmit={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          form.handleSubmit();
-        }}
-      />
+      {joinedCommunities.length === 0 ? (
+        <EmptyStateCard
+          title="Join a community first"
+          description="You can only post in communities you've joined. Explore communities and join one to start posting."
+          meta={
+            <button
+              type="button"
+              onClick={() => navigate("/communities")}
+              className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-700/70 bg-slate-800 px-4 text-sm font-semibold text-slate-100 transition duration-300 hover:border-blue-400/60 hover:bg-slate-700"
+            >
+              Browse communities
+            </button>
+          }
+        />
+      ) : (
+        <CreatePostForm
+          formApi={form}
+          communitiesList={joinedCommunities}
+          isSubmitting={createPost.isPending}
+          onSubmit={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            form.handleSubmit();
+          }}
+        />
+      )}
       <DraftPreview draft={draftPreview} />
     </PageShell>
   );
