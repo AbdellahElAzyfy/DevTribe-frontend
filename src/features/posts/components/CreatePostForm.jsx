@@ -87,10 +87,13 @@ const imageSchema = z
 function CreatePostForm({
   formApi,
   onSubmit,
-  communitiesList,
+  communitiesList = [],
   isSubmitting = false,
+  mode = "create",
+  communityLabel = "",
 }) {
   const Form = formApi;
+  const isEdit = mode === "edit";
 
   return (
     <form
@@ -98,10 +101,12 @@ function CreatePostForm({
       className="rounded-2xl border border-slate-700/70 bg-slate-900/60 p-5 shadow-lg shadow-black/25 sm:p-6"
     >
       <h1 className="text-2xl font-semibold tracking-tight text-slate-100 sm:text-3xl">
-        Create post
+        {isEdit ? "Edit post" : "Create post"}
       </h1>
       <p className="mt-1 text-sm text-slate-400">
-        Share your idea in a clean writing flow designed for developers.
+        {isEdit
+          ? "Update your post. The community it was published in can't be changed."
+          : "Share your idea in a clean writing flow designed for developers."}
       </p>
 
       <div className="mt-6 space-y-5">
@@ -123,13 +128,21 @@ function CreatePostForm({
           }}
         />
 
-        <Form.Field name="communitySlug">
-          {(field) => (
-            <FormField label="Community" htmlFor="create-post-community">
-              <CommunityPicker field={field} options={communitiesList} />
-            </FormField>
-          )}
-        </Form.Field>
+        {isEdit ? (
+          <FormField label="Community" htmlFor="create-post-community">
+            <div className="flex h-11 w-full items-center rounded-xl border border-slate-700/70 bg-slate-950/45 px-4 text-sm text-slate-400">
+              r/{communityLabel}
+            </div>
+          </FormField>
+        ) : (
+          <Form.Field name="communitySlug">
+            {(field) => (
+              <FormField label="Community" htmlFor="create-post-community">
+                <CommunityPicker field={field} options={communitiesList} />
+              </FormField>
+            )}
+          </Form.Field>
+        )}
 
         <TextareaField
           formApi={Form}
@@ -254,7 +267,13 @@ function CreatePostForm({
               disabled={!canSubmit || isLoading}
               className="mt-6 inline-flex h-11 items-center justify-center rounded-xl border border-slate-700/70 bg-slate-800 px-5 text-sm font-semibold text-slate-100 transition duration-300 hover:border-blue-400/60 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isLoading ? "Creating..." : "Create Post"}
+              {isLoading
+                ? isEdit
+                  ? "Saving..."
+                  : "Creating..."
+                : isEdit
+                  ? "Save changes"
+                  : "Create Post"}
             </button>
           );
         }}

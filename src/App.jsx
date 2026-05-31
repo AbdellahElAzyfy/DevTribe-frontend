@@ -8,6 +8,7 @@ import Communities from "./pages/Communities";
 import CommunityDetail from "./pages/CommunityDetail";
 import PostDetail from "./pages/PostDetail";
 import CreatePost from "./pages/CreatePost";
+import EditPost from "./pages/EditPost";
 import ManageCommunities from "./pages/ManageCommunities";
 import Profile from "./pages/Profile";
 import Saved from "./pages/Saved";
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
           {
             path: "/post/:id",
             element: <PostDetail />,
+          },
+          {
+            path: "/post/:id/edit",
+            element: <EditPost />,
           },
           {
             path: "/create-post",

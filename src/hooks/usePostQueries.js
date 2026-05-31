@@ -98,6 +98,8 @@ export function useCreatePost(options = {}) {
  */
 export function useUpdatePost(options = {}) {
   const queryClient = useQueryClient();
+  // Keep the caller's onSuccess out of the spread so it can't override ours.
+  const { onSuccess: callerOnSuccess, ...rest } = options;
 
   return useMutation({
     mutationFn: ({ postId, data }) => postsApi.updatePost(postId, data),
@@ -118,9 +120,9 @@ export function useUpdatePost(options = {}) {
         queryKey: queryKeys.posts.drafts(),
       });
 
-      options.onSuccess?.(data, { postId }, context);
+      callerOnSuccess?.(data, { postId }, context);
     },
-    ...options,
+    ...rest,
   });
 }
 
@@ -131,29 +133,46 @@ export function useUpdatePost(options = {}) {
  */
 export function useDeletePost(options = {}) {
   const queryClient = useQueryClient();
+  // Keep the caller's onSuccess out of the spread so it can't override ours.
+  const { onSuccess: callerOnSuccess, ...rest } = options;
 
   return useMutation({
     mutationFn: (postId) => postsApi.deletePost(postId),
     onSuccess: (data, postId, context) => {
-      // Remove from cache
+      const idStr = String(postId);
+
+      // Remove the deleted post from every posts cache entry immediately so it
+      // disappears from feeds/lists without waiting for a refetch.
+      queryClient.setQueriesData(
+        { queryKey: queryKeys.posts.all() },
+        (oldData) => {
+          if (!oldData) return oldData;
+          if (Array.isArray(oldData)) {
+            return oldData.filter((p) => String(p.id) !== idStr);
+          }
+          if (Array.isArray(oldData?.posts)) {
+            return {
+              ...oldData,
+              posts: oldData.posts.filter((p) => String(p.id) !== idStr),
+            };
+          }
+          return oldData;
+        },
+      );
+
+      // Remove the detail entry
       queryClient.removeQueries({
         queryKey: queryKeys.posts.detail(postId),
       });
 
-      // Invalidate lists
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.posts.lists(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.posts.feed(),
-      });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.posts.drafts(),
-      });
+      // Reconcile lists/feeds with the server in the background.
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.feed() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.drafts() });
 
-      options.onSuccess?.(data, postId, context);
+      callerOnSuccess?.(data, postId, context);
     },
-    ...options,
+    ...rest,
   });
 }
 

@@ -1,19 +1,42 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaArrowDown, FaArrowUp, FaReply } from "react-icons/fa6";
+import {
+  FaArrowDown,
+  FaArrowUp,
+  FaPen,
+  FaReply,
+  FaTrash,
+} from "react-icons/fa6";
 import { formatTimeAgo, formatUsername } from "../../../utils/formatUtils";
 import resolveImageUrl from "../../../utils/resolveImageUrl";
-import { useVoteComment } from "../../../hooks/useCommentQueries";
+import {
+  useDeleteComment,
+  useUpdateComment,
+  useVoteComment,
+} from "../../../hooks/useCommentQueries";
 import { useAuth } from "../../../hooks/useAuth";
+import ConfirmDialog from "../../../ui/ConfirmDialog";
 import CommentInput from "./CommentInput";
 
 const MAX_NESTING_DEPTH = 4;
+const MAX_COMMENT_LENGTH = 3000;
 
 export default function CommentItem({ comment, postId, depth = 0 }) {
   const [isReplying, setIsReplying] = useState(false);
   const [areRepliesOpen, setAreRepliesOpen] = useState(true);
-  const { isAuthenticated } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(comment.content ?? "");
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const { isAuthenticated, user: currentUser } = useAuth();
   const voteCommentMutation = useVoteComment();
+  const updateCommentMutation = useUpdateComment();
+  const deleteCommentMutation = useDeleteComment({
+    onSuccess: () => setIsDeleteOpen(false),
+  });
+
+  const canManage =
+    Boolean(currentUser?.username) &&
+    currentUser.username === comment.author?.username;
 
   const displayUsername = formatUsername(
     comment.author?.username || "anonymous",
@@ -40,6 +63,26 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
     voteCommentMutation.mutate({ postId, commentId: comment.id, value });
   };
 
+  const startEditing = () => {
+    setEditValue(comment.content ?? "");
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    const trimmed = editValue.trim();
+    if (!trimmed || trimmed.length > MAX_COMMENT_LENGTH) return;
+    if (trimmed === comment.content) {
+      setIsEditing(false);
+      return;
+    }
+    if (updateCommentMutation.isPending) return;
+
+    updateCommentMutation.mutate(
+      { commentId: comment.id, data: { content: trimmed } },
+      { onSuccess: () => setIsEditing(false) },
+    );
+  };
+
   return (
     <article className="group animate-in fade-in slide-in-from-left-2 duration-300">
       <div className="flex items-start gap-3">
@@ -62,9 +105,48 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
                 {timeAgo}
               </span>
             </div>
-            <p className="mt-1 text-[13.5px] leading-relaxed text-slate-300 whitespace-pre-wrap">
-              {comment.content}
-            </p>
+            {isEditing ? (
+              <div className="mt-2">
+                <textarea
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  rows={3}
+                  maxLength={MAX_COMMENT_LENGTH}
+                  autoFocus
+                  className="w-full resize-none rounded-lg border border-slate-700/70 bg-slate-950/50 px-3 py-2 text-[13.5px] leading-relaxed text-slate-200 outline-none transition focus:border-blue-400/60"
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") setIsEditing(false);
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                      e.preventDefault();
+                      handleSaveEdit();
+                    }
+                  }}
+                />
+                <div className="mt-2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSaveEdit}
+                    disabled={
+                      !editValue.trim() || updateCommentMutation.isPending
+                    }
+                    className="rounded-full bg-blue-600 px-4 py-1.5 text-[12px] font-bold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {updateCommentMutation.isPending ? "Saving..." : "Save"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="rounded-full px-3 py-1.5 text-[12px] font-semibold text-slate-400 transition hover:text-slate-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-1 text-[13.5px] leading-relaxed text-slate-300 whitespace-pre-wrap">
+                {comment.content}
+              </p>
+            )}
           </div>
 
           <div className="mt-1.5 flex items-center gap-1 pl-1 text-[11px] text-slate-400">
@@ -119,6 +201,27 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
               </button>
             )}
 
+            {canManage && !isEditing && (
+              <>
+                <button
+                  type="button"
+                  onClick={startEditing}
+                  className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-slate-400 transition-colors hover:bg-slate-800/60 hover:text-slate-200"
+                >
+                  <FaPen className="h-3 w-3" />
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-slate-400 transition-colors hover:bg-rose-500/10 hover:text-rose-400"
+                >
+                  <FaTrash className="h-3 w-3" />
+                  Delete
+                </button>
+              </>
+            )}
+
             {hasReplies && (
               <button
                 type="button"
@@ -158,6 +261,22 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={isDeleteOpen}
+        title="Delete comment"
+        description={
+          hasReplies
+            ? "This will delete your comment and its replies. This action cannot be undone."
+            : "This will permanently delete your comment. This action cannot be undone."
+        }
+        confirmLabel="Delete comment"
+        isLoading={deleteCommentMutation.isPending}
+        onConfirm={() =>
+          deleteCommentMutation.mutate({ postId, commentId: comment.id })
+        }
+        onClose={() => setIsDeleteOpen(false)}
+      />
     </article>
   );
 }

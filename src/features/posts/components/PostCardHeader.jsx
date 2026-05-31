@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { FaEllipsis, FaPen, FaTrash } from "react-icons/fa6";
 import {
   formatTimeAgo,
   calculateReadTime,
@@ -15,12 +17,38 @@ function PostCardHeader({
   readTime,
   isEdited,
   content,
+  canManage = false,
+  onEdit,
+  onDelete,
 }) {
   const displayUsername = formatUsername(user?.username || "anonymous");
   const displayCommunity = formatCommunityName(communityName);
   const timeAgo = formatTimeAgo(createdAt);
   const estimatedReadTime = readTime || calculateReadTime(content);
   const role = user?.role || "member";
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) return undefined;
+
+    const handlePointer = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    const handleEsc = (event) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointer);
+    window.addEventListener("keydown", handleEsc);
+    return () => {
+      document.removeEventListener("mousedown", handlePointer);
+      window.removeEventListener("keydown", handleEsc);
+    };
+  }, [isMenuOpen]);
 
   return (
     <div className="mb-4 flex items-center gap-3">
@@ -80,6 +108,54 @@ function PostCardHeader({
           </span>
         </div>
       </div>
+
+      {/* Author actions */}
+      {canManage && (
+        <div className="relative shrink-0" ref={menuRef}>
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            aria-label="Post options"
+            aria-haspopup="menu"
+            aria-expanded={isMenuOpen}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-800/80 hover:text-slate-200"
+          >
+            <FaEllipsis className="h-4 w-4" />
+          </button>
+
+          {isMenuOpen && (
+            <div
+              role="menu"
+              className="absolute right-0 z-30 mt-1 w-36 overflow-hidden rounded-xl border border-slate-700/70 bg-slate-900/95 shadow-xl shadow-black/40"
+            >
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onEdit?.();
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm text-slate-200 transition-colors hover:bg-slate-800/80"
+              >
+                <FaPen className="h-3.5 w-3.5 text-slate-400" />
+                Edit
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onDelete?.();
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-sm text-rose-400 transition-colors hover:bg-rose-500/10"
+              >
+                <FaTrash className="h-3.5 w-3.5" />
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

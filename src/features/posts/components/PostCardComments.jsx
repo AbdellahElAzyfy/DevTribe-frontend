@@ -1,17 +1,38 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CommentItem from "../../comments/components/CommentItem";
 import CommentInput from "../../comments/components/CommentInput";
 import buildCommentTree from "../../comments/buildCommentTree";
 import { useListComments } from "../../../hooks/useCommentQueries";
 
-function PostCardComments({ postId, initialVisibleCount = 2 }) {
+function PostCardComments({ postId, initialVisibleCount = 2, onTotalChange }) {
+  // `limit` is the requested page size. When it equals initialVisibleCount the
+  // list is collapsed; clicking "View more" grows it, "Show less" resets it.
   const [limit, setLimit] = useState(initialVisibleCount);
   const { data: commentsData, isLoading } = useListComments(postId, { limit });
 
-  const comments = commentsData?.comments || [];
+  const comments = useMemo(
+    () => commentsData?.comments || [],
+    [commentsData],
+  );
   const totalComments = commentsData?.total || 0;
-  const hasMore = totalComments > comments.length;
   const commentTree = useMemo(() => buildCommentTree(comments), [comments]);
+
+  // Decide the controls against the authoritative total so deletions collapse
+  // them correctly — no effect-driven `limit` resets needed:
+  //   hasMore   → more comments exist on the server than are shown right now.
+  //   isExpanded→ we're past the initial window AND there's still enough total
+  //               to make "collapse" meaningful (hidden once everything fits).
+  const hasMore = totalComments > comments.length;
+  const isExpanded =
+    limit > initialVisibleCount && totalComments > initialVisibleCount;
+
+  // Surface the live total up to the card so the comment-count badge always
+  // matches the actual comment list (single source of truth).
+  useEffect(() => {
+    if (commentsData) {
+      onTotalChange?.(totalComments);
+    }
+  }, [commentsData, totalComments, onTotalChange]);
 
   return (
     <div className="mt-4 space-y-4 border-t border-slate-700/50 pt-4">
@@ -45,11 +66,12 @@ function PostCardComments({ postId, initialVisibleCount = 2 }) {
               onClick={() => setLimit((prev) => prev + 5)}
               className="text-sm font-medium text-sky-300 transition-colors duration-300 hover:text-sky-200"
             >
-              View more comments ({totalComments - comments.length} left)
+              View more comments (
+              {Math.max(0, totalComments - comments.length)} left)
             </button>
           )}
 
-          {limit > initialVisibleCount && (
+          {isExpanded && (
             <button
               type="button"
               onClick={() => setLimit(initialVisibleCount)}
