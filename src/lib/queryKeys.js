@@ -69,6 +69,10 @@ export const queryKeys = {
   search: {
     all: () => ["search"],
     query: (value) => [...queryKeys.search.all(), "query", value],
+    combined: (q) => [...queryKeys.search.all(), "combined", q],
+    posts: (params) => [...queryKeys.search.all(), "posts", params],
+    communities: (params) => [...queryKeys.search.all(), "communities", params],
+    users: (params) => [...queryKeys.search.all(), "users", params],
   },
 
   // ============ SAVED POSTS ============
@@ -82,5 +86,20 @@ export const queryKeys = {
     all: () => ["notifications"],
     lists: () => [...queryKeys.notifications.all(), "list"],
     list: (params) => [...queryKeys.notifications.lists(), params],
+  },
+
+  // ============ MESSAGES ============
+  messages: {
+    all: () => ["messages"],
+    conversations: () => [...queryKeys.messages.all(), "conversations"],
+    conversation: (userId) => [...queryKeys.messages.all(), "conversation", String(userId)],
+    unreadCount: () => [...queryKeys.messages.all(), "unread-count"],
+  },
+
+  // ============ USERS ============
+  users: {
+    all: () => ["users"],
+    profiles: () => [...queryKeys.users.all(), "profile"],
+    profile: (username) => [...queryKeys.users.profiles(), username],
   },
 };

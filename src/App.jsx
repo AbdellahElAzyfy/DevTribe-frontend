@@ -17,6 +17,9 @@ import AppLayout from "./ui/AppLayout";
 import Notifications from "./pages/Notifications";
 import PopularPosts from "./pages/PopularPosts";
 import Explore from "./pages/Explore";
+import Messages from "./pages/Messages";
+import UserProfile from "./pages/UserProfile";
+import Search from "./pages/Search";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import PublicRoute from "./ui/PublicRoute";
 
@@ -71,7 +74,10 @@ const router = createBrowserRouter([
           },
           {
             path: "/profile",
-            element: <Profile />,
+            children: [
+              { index: true, element: <Profile /> },
+              { path: ":username", element: <UserProfile /> },
+            ],
           },
           {
             path: "/notifications",
@@ -86,8 +92,19 @@ const router = createBrowserRouter([
             element: <Explore />,
           },
           {
+            path: "/search",
+            element: <Search />,
+          },
+          {
             path: "/saved",
             element: <Saved />,
+          },
+          {
+            path: "/messages",
+            children: [
+              { index: true, element: <Messages /> },
+              { path: ":userId", element: <Messages /> },
+            ],
           },
         ],
       },

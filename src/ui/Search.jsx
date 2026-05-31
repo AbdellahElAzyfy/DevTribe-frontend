@@ -1,12 +1,24 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiMagnifyingGlass, HiXMark } from "react-icons/hi2";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { closeMobileSearch, toggleMobileSearch } from "../store/uiSlice";
 
 export default function Search() {
   const dispatch = useDispatch();
   const isMobileOpen = useSelector((state) => state.ui.isMobileSearchOpen);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const inputRef = useRef(null);
+
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    if (location.pathname === "/search") {
+      setValue(searchParams.get("q") ?? "");
+    }
+  }, [location.pathname, searchParams]);
 
   useEffect(() => {
     if (!isMobileOpen) return;
@@ -36,15 +48,25 @@ export default function Search() {
     };
   }, [dispatch]);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    dispatch(closeMobileSearch());
+    navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+  };
+
   return (
     <div className="mx-1 min-w-0 md:mx-6 md:flex-1 md:max-w-2xl">
-      <div className="hidden md:block">
+      <form onSubmit={handleSubmit} className="hidden md:block">
         <input
           type="text"
-          placeholder="Search posts or communities..."
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Search posts, communities, or users..."
           className="dash-frame h-11 w-full min-w-0 rounded-full border-2 border-transparent [--dash-color:rgba(100,116,139,0.48)] bg-slate-800/95 px-4 text-sm text-slate-200 placeholder:text-slate-500 shadow-inner shadow-black/20 transition-all duration-300 ease-out focus:[--dash-color:rgba(96,165,250,0.74)] focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/35"
         />
-      </div>
+      </form>
 
       <button
         type="button"
@@ -61,12 +83,17 @@ export default function Search() {
 
       {isMobileOpen ? (
         <div className="absolute inset-x-0 top-full z-40 mt-2 px-3 sm:px-6 md:hidden">
-          <div className="dash-frame flex items-center gap-2 rounded-xl border-2 border-transparent [--dash-color:rgba(100,116,139,0.52)] bg-slate-900/95 p-2 shadow-xl shadow-black/40">
+          <form
+            onSubmit={handleSubmit}
+            className="dash-frame flex items-center gap-2 rounded-xl border-2 border-transparent [--dash-color:rgba(100,116,139,0.52)] bg-slate-900/95 p-2 shadow-xl shadow-black/40"
+          >
             <HiMagnifyingGlass className="ml-2 h-4 w-4 shrink-0 text-slate-400" />
             <input
               ref={inputRef}
               type="text"
-              placeholder="Search posts or communities..."
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="Search posts, communities, or users..."
               className="h-9 w-full bg-transparent px-1 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none"
             />
             <button
@@ -77,7 +104,7 @@ export default function Search() {
             >
               <HiXMark className="h-5 w-5" />
             </button>
-          </div>
+          </form>
         </div>
       ) : null}
     </div>
