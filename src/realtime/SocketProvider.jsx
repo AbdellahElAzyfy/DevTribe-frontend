@@ -5,6 +5,7 @@ import { getSocket } from "../services/socketClient";
 import { register as registerNotifications } from "./handlers/notifications";
 import { register as registerPosts } from "./handlers/posts";
 import { register as registerComments } from "./handlers/comments";
+import { register as registerMessages } from "./handlers/messages";
 
 export default function SocketProvider({ children }) {
   const queryClient = useQueryClient();
@@ -26,6 +27,7 @@ export default function SocketProvider({ children }) {
       registerNotifications(socket, ctx),
       registerPosts(socket, ctx),
       registerComments(socket, ctx),
+      registerMessages(socket, ctx),
     ];
 
     return () => {

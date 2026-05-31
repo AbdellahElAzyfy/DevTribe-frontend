@@ -38,6 +38,13 @@ function renderContent(notification) {
         to: data.postId ? `/post/${data.postId}` : null,
       };
     }
+    case "comment_reply": {
+      return {
+        title: `${actorName} replied to your comment`,
+        body: data.commentSnippet || data.parentCommentSnippet || "",
+        to: data.postId ? `/post/${data.postId}` : null,
+      };
+    }
     case "comment_vote": {
       const direction = Number(data.value) === -1 ? "downvoted" : "upvoted";
       return {
@@ -52,6 +59,15 @@ function renderContent(notification) {
         title: `${actorName} posted in r/${community ?? "a community"}`,
         body: postTitle,
         to: data.postId ? `/post/${data.postId}` : null,
+      };
+    }
+    case "direct_message": {
+      const senderUsername = data.senderUsername || actorName;
+      const snippet = data.messageSnippet || "";
+      return {
+        title: `${senderUsername} sent you a message`,
+        body: snippet,
+        to: data.senderId ? `/messages/${data.senderId}` : null,
       };
     }
     default:

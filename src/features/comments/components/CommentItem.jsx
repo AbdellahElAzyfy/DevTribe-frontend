@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { FaArrowDown, FaArrowUp, FaReply } from "react-icons/fa6";
 import { formatTimeAgo, formatUsername } from "../../../utils/formatUtils";
 import resolveImageUrl from "../../../utils/resolveImageUrl";
@@ -51,9 +52,12 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
         <div className="min-w-0 flex-1">
           <div className="rounded-2xl bg-slate-800/30 border border-slate-700/40 px-4 py-2.5 transition-all duration-200 group-hover:bg-slate-800/50 group-hover:border-slate-600/50">
             <div className="flex items-center justify-between gap-2">
-              <p className="truncate text-[13px] font-semibold text-slate-200">
+              <Link
+                to={`/profile/${comment.author?.username}`}
+                className="truncate text-[13px] font-semibold text-slate-200 hover:text-blue-400 transition"
+              >
                 {displayUsername}
-              </p>
+              </Link>
               <span className="shrink-0 text-[10px] font-medium text-slate-500 uppercase tracking-tight">
                 {timeAgo}
               </span>

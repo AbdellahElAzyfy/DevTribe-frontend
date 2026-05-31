@@ -83,4 +83,19 @@ export const queryKeys = {
     lists: () => [...queryKeys.notifications.all(), "list"],
     list: (params) => [...queryKeys.notifications.lists(), params],
   },
+
+  // ============ MESSAGES ============
+  messages: {
+    all: () => ["messages"],
+    conversations: () => [...queryKeys.messages.all(), "conversations"],
+    conversation: (userId) => [...queryKeys.messages.all(), "conversation", String(userId)],
+    unreadCount: () => [...queryKeys.messages.all(), "unread-count"],
+  },
+
+  // ============ USERS ============
+  users: {
+    all: () => ["users"],
+    profiles: () => [...queryKeys.users.all(), "profile"],
+    profile: (username) => [...queryKeys.users.profiles(), username],
+  },
 };
