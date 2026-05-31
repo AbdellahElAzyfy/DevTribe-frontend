@@ -201,89 +201,6 @@
   }
 }
 
-@keyframes authBrandGlow {
-  0% {
-    text-shadow:
-      0 0 10px rgba(56, 189, 248, 0.2),
-      0 0 18px rgba(37, 99, 235, 0.1);
-    opacity: 0.9;
-  }
-  50% {
-    text-shadow:
-      0 0 14px rgba(56, 189, 248, 0.35),
-      0 0 28px rgba(59, 130, 246, 0.16);
-    opacity: 1;
-  }
-  100% {
-    text-shadow:
-      0 0 10px rgba(56, 189, 248, 0.2),
-      0 0 18px rgba(37, 99, 235, 0.1);
-    opacity: 0.9;
-  }
-}
-
-.auth-panel {
-  border: 1px solid rgba(71, 85, 105, 0.75);
-  border-radius: 1.1rem;
-  background: linear-gradient(
-    160deg,
-    rgba(15, 23, 42, 0.95) 0%,
-    rgba(15, 23, 42, 0.72) 100%
-  );
-  box-shadow:
-    inset 0 0 0 1px rgba(148, 163, 184, 0.05),
-    0 26px 48px rgba(2, 6, 23, 0.58),
-    0 0 0 1px rgba(56, 189, 248, 0.04);
-  overflow: hidden;
-  will-change: transform;
-}
-
-.auth-brand {
-  position: absolute;
-  left: 58px;
-  top: 18px;
-  z-index: 40;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.62rem;
-  padding: 0.55rem 0.95rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(59, 130, 246, 0.38);
-  background: linear-gradient(
-    120deg,
-    rgba(15, 23, 42, 0.92),
-    rgba(15, 23, 42, 0.75)
-  );
-  box-shadow:
-    0 12px 30px rgba(2, 6, 23, 0.52),
-    inset 0 0 0 1px rgba(148, 163, 184, 0.1);
-}
-
-.auth-brand-dot {
-  height: 0.52rem;
-  width: 0.52rem;
-  border-radius: 9999px;
-  background: rgba(56, 189, 248, 0.92);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.72);
-}
-
-.auth-brand-text {
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  text-transform: none;
-  color: rgba(224, 242, 254, 0.98);
-  text-rendering: geometricPrecision;
-  animation: authBrandGlow 5.4s ease-in-out infinite;
-}
-
-.auth-grid {
-  background-image:
-    linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-
 .auth-orb {
   position: absolute;
   border-radius: 9999px;
@@ -484,8 +401,7 @@
   .auth-float-fast,
   .auth-float-mid,
   .auth-float-node,
-  .auth-pulse-node,
-  .auth-brand-text {
+  .auth-pulse-node {
     animation: none !important;
   }
 }
