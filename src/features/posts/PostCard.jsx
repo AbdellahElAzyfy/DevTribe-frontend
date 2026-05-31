@@ -3,6 +3,7 @@ import {
   useToggleSavedPostMutation,
   useVotePostMutation,
 } from "./usePostQueries";
+import { useSharePost } from "./useSharePost";
 import PostCardHeader from "./components/PostCardHeader";
 import PostCardBody from "./components/PostCardBody";
 import PostCardActions from "./components/PostCardActions";
@@ -41,6 +42,10 @@ export default function PostCard({ post }) {
 
   const toggleSavedPostMutation = useToggleSavedPostMutation();
   const votePostMutation = useVotePostMutation();
+  const { share, didCopy: didCopyShareLink } = useSharePost({
+    postId: post.id,
+    title,
+  });
   const isTogglingSavedState =
     toggleSavedPostMutation.isPending &&
     Number(toggleSavedPostMutation.variables) === post.id;
@@ -91,6 +96,8 @@ export default function PostCard({ post }) {
             isVoting={votePostMutation.isPending}
             commentsCount={commentsCount ?? commentCount ?? comments.length}
             onToggleComments={handleToggleComments}
+            onShare={share}
+            didCopyShareLink={didCopyShareLink}
             isSaved={isSaved}
             isTogglingSavedState={isTogglingSavedState}
             onToggleSaved={() => toggleSavedPostMutation.mutate(post.id)}

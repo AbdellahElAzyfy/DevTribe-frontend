@@ -27,6 +27,7 @@ npm run lint
 Create a `.env` file with:
 - `VITE_API_URL` - Backend API base URL (e.g., `http://localhost:5000/api/v1`)
 - `VITE_SOCKET_URL` - Socket.io server URL (e.g., `http://localhost:5000`)
+- `VITE_PUBLIC_APP_URL` - (Optional) Public base URL used to build shareable post links (see `useSharePost`). Falls back to `window.location.origin` when unset. Set to a tunnel URL for local share testing, or the deployed domain in production. A `localhost` value cannot be opened by other people/devices.
 
 ## Architecture
 

@@ -2,6 +2,7 @@ import {
   FaArrowDown,
   FaArrowUp,
   FaBookmark,
+  FaCheck,
   FaRegBookmark,
   FaRegCommentDots,
   FaRegShareFromSquare,
@@ -16,6 +17,8 @@ function PostCardActions({
   isVoting,
   commentsCount,
   onToggleComments,
+  onShare,
+  didCopyShareLink,
   isSaved,
   isTogglingSavedState,
   onToggleSaved,
@@ -75,10 +78,23 @@ function PostCardActions({
 
       <button
         type="button"
-        aria-label="Share"
-        className="inline-flex items-center justify-center rounded-full border border-slate-700/70 bg-slate-950/55 p-2.5 text-slate-300 transition-all duration-300 ease-out hover:border-slate-600 hover:bg-slate-900/80 hover:text-white"
+        onClick={onShare}
+        aria-label={didCopyShareLink ? "Link copied" : "Share post"}
+        title={didCopyShareLink ? "Link copied!" : "Share post"}
+        className={`inline-flex items-center gap-2 rounded-full border p-2.5 transition-all duration-300 ease-out ${
+          didCopyShareLink
+            ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
+            : "border-slate-700/70 bg-slate-950/55 text-slate-300 hover:border-slate-600 hover:bg-slate-900/80 hover:text-white"
+        }`}
       >
-        <FaRegShareFromSquare className="h-4 w-4" />
+        {didCopyShareLink ? (
+          <>
+            <FaCheck className="h-4 w-4 animate-in fade-in zoom-in duration-300" />
+            <span className="text-[11px] font-semibold">Copied</span>
+          </>
+        ) : (
+          <FaRegShareFromSquare className="h-4 w-4" />
+        )}
       </button>
 
       <button
