@@ -79,20 +79,13 @@ export function useUpdateProfile(options = {}) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data) => {
-      // data can be FormData (for file upload) or plain object
-      return apiClient.patch("/auth/me", data, {
-        headers:
-          data instanceof FormData
-            ? { "Content-Type": "multipart/form-data" }
-            : {},
-      });
-    },
-    onSuccess: (response, variables, context) => {
-      const updatedUser = response.data?.user || response.data;
-      // Update the current user cache
+    // data can be FormData (avatar upload) or a plain object — apiAuth handles both
+    mutationFn: (data) => authApi.updateProfile(data),
+    onSuccess: (result, variables, context) => {
+      const updatedUser = result?.user ?? result;
+      // Update the current user cache so the profile reflects changes immediately
       queryClient.setQueryData(queryKeys.auth.currentUser(), updatedUser);
-      options.onSuccess?.(response, variables, context);
+      options.onSuccess?.(result, variables, context);
     },
     ...options,
   });
@@ -105,8 +98,7 @@ export function useUpdateProfile(options = {}) {
  */
 export function useChangePassword(options = {}) {
   return useMutation({
-    mutationFn: (data) =>
-      apiClient.patch("/auth/me/password", data).then((res) => res.data),
+    mutationFn: (data) => authApi.changePassword(data),
     ...options,
   });
 }

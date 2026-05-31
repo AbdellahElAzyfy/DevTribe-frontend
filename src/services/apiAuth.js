@@ -78,6 +78,30 @@ export async function getCurrentUser() {
   }
 }
 
+export async function updateProfile(data) {
+  try {
+    const isFormData =
+      typeof FormData !== "undefined" && data instanceof FormData;
+
+    const response = await apiClient.patch("/auth/me", data, {
+      headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+    });
+
+    return normalizeAuthResult(response.data);
+  } catch (error) {
+    throw mapAuthError(error);
+  }
+}
+
+export async function changePassword(data) {
+  try {
+    const response = await apiClient.patch("/auth/me/password", data);
+    return response.data;
+  } catch (error) {
+    throw mapAuthError(error);
+  }
+}
+
 export async function logout() {
   try {
     await apiClient.post("/auth/logout");
@@ -94,6 +118,8 @@ export default {
   login,
   refreshSession,
   getCurrentUser,
+  updateProfile,
+  changePassword,
   logout,
   configureAuthService,
 };
