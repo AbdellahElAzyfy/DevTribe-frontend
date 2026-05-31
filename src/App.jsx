@@ -19,6 +19,7 @@ import PopularPosts from "./pages/PopularPosts";
 import Explore from "./pages/Explore";
 import Messages from "./pages/Messages";
 import UserProfile from "./pages/UserProfile";
+import Search from "./pages/Search";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import PublicRoute from "./ui/PublicRoute";
 
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
           {
             path: "/explore",
             element: <Explore />,
+          },
+          {
+            path: "/search",
+            element: <Search />,
           },
           {
             path: "/saved",

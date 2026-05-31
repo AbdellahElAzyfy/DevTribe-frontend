@@ -69,6 +69,10 @@ export const queryKeys = {
   search: {
     all: () => ["search"],
     query: (value) => [...queryKeys.search.all(), "query", value],
+    combined: (q) => [...queryKeys.search.all(), "combined", q],
+    posts: (params) => [...queryKeys.search.all(), "posts", params],
+    communities: (params) => [...queryKeys.search.all(), "communities", params],
+    users: (params) => [...queryKeys.search.all(), "users", params],
   },
 
   // ============ SAVED POSTS ============
