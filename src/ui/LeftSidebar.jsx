@@ -14,36 +14,9 @@ function LeftSidebar({ mobileOpen = false, onMobileClose }) {
   const [isCommunityListOpen, setIsCommunityListOpen] = useState(true);
   const { data: communities = [] } = useCommunitiesQuery();
 
-  const communityItems = useMemo(() => {
-    if (communities.length) {
-      return communities;
-    }
-
-    return [
-      {
-        id: "fallback-reactjs",
-        slug: "reactjs",
-        name: "ReactJS",
-        isJoined: true,
-      },
-      {
-        id: "fallback-laravel",
-        slug: "laravel",
-        name: "Laravel",
-        isJoined: false,
-      },
-      {
-        id: "fallback-javascript",
-        slug: "javascript",
-        name: "JavaScript",
-        isJoined: true,
-      },
-    ];
-  }, [communities]);
-
   const joinedCommunities = useMemo(
-    () => communityItems.filter((community) => community.isJoined).slice(0, 3),
-    [communityItems],
+    () => communities.filter((community) => community.isJoined).slice(0, 3),
+    [communities],
   );
 
   const handleMobileClose = () => {
@@ -66,7 +39,7 @@ function LeftSidebar({ mobileOpen = false, onMobileClose }) {
       />
 
       <SidebarCommunitiesSection
-        communityItems={communityItems}
+        communityItems={communities}
         isOpen={isCommunityListOpen}
         onToggle={() => setIsCommunityListOpen((prev) => !prev)}
         onNavigate={handleMobileClose}
