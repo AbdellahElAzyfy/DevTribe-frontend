@@ -88,6 +88,12 @@ export default function PostCard({ post }) {
     <article className="group rounded-xl border border-slate-700/70 bg-slate-900/55 shadow-lg shadow-black/25 ring-1 ring-slate-800/40 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-slate-500/70 hover:bg-slate-900/70 hover:shadow-black/40">
       <div className="p-4 sm:p-5">
         <div className="min-w-0">
+          {post.isApproved === false ? (
+            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-200">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
+              Pending review
+            </div>
+          ) : null}
           <PostCardHeader
             user={user}
             communityName={communityName ?? community?.name}

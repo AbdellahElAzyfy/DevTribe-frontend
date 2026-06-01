@@ -21,6 +21,8 @@ import Explore from "./pages/Explore";
 import Messages from "./pages/Messages";
 import UserProfile from "./pages/UserProfile";
 import Search from "./pages/Search";
+import PostModeration from "./pages/PostModeration";
+import CommunityModerationQueue from "./pages/CommunityModerationQueue";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import PublicRoute from "./ui/PublicRoute";
 
@@ -62,12 +64,20 @@ const router = createBrowserRouter([
             element: <CommunityDetail />,
           },
           {
+            path: "/community/:identifier/moderation",
+            element: <CommunityModerationQueue />,
+          },
+          {
             path: "/post/:id",
             element: <PostDetail />,
           },
           {
             path: "/post/:id/edit",
             element: <EditPost />,
+          },
+          {
+            path: "/post/:id/moderate",
+            element: <PostModeration />,
           },
           {
             path: "/create-post",

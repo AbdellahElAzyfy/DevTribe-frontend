@@ -45,6 +45,7 @@ export default function CreatePostPage() {
   const queryClient = useQueryClient();
   const [draftPreview, setDraftPreview] = useState(null);
   const [submitError, setSubmitError] = useState("");
+  const [pendingNotice, setPendingNotice] = useState("");
 
   const { data: communities = [] } = useListCommunities();
 
@@ -60,6 +61,12 @@ export default function CreatePostPage() {
       form.reset();
       // Wait for cache invalidation to finish before navigating
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
+      if (data?.post && data.post.isApproved === false && !data.post.isDraft) {
+        setPendingNotice(
+          "Your post is awaiting moderator approval. It will appear in the feed once approved.",
+        );
+        return;
+      }
       navigate("/profile");
     },
     onError: (error) => {
@@ -138,6 +145,18 @@ export default function CreatePostPage() {
           }
         />
       )}
+      {pendingNotice ? (
+        <div className="flex flex-col gap-3 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-sm text-amber-100 sm:flex-row sm:items-center sm:justify-between">
+          <p>{pendingNotice}</p>
+          <button
+            type="button"
+            onClick={() => navigate("/profile")}
+            className="inline-flex items-center justify-center rounded-lg border border-amber-300/60 bg-amber-400/20 px-3 py-1.5 text-xs font-semibold text-amber-100 transition hover:bg-amber-400/30"
+          >
+            Go to profile
+          </button>
+        </div>
+      ) : null}
       {joinedCommunities.length === 0 ? (
         <EmptyStateCard
           title="Join a community first"

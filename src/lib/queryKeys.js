@@ -81,6 +81,16 @@ export const queryKeys = {
     posts: () => [...queryKeys.saved.all(), "posts"],
   },
 
+  // ============ MODERATION ============
+  moderation: {
+    all: () => ["moderation"],
+    pending: (communityIdentifier) => [
+      ...queryKeys.moderation.all(),
+      "pending",
+      String(communityIdentifier),
+    ],
+  },
+
   // ============ NOTIFICATIONS ============
   notifications: {
     all: () => ["notifications"],

@@ -61,6 +61,22 @@ function renderContent(notification) {
         to: data.postId ? `/post/${data.postId}` : null,
       };
     }
+    case "post_pending_moderation": {
+      const community = data.communitySlug || data.communityName;
+      return {
+        title: `${actorName} posted in r/${community ?? "a community"} – needs review`,
+        body: data.postTitle || data.snippet || "Awaiting review",
+        to: data.postId ? `/post/${data.postId}/moderate` : null,
+      };
+    }
+    case "post_approved": {
+      const community = data.communitySlug || data.communityName;
+      return {
+        title: `Your post was approved in r/${community ?? "the community"}`,
+        body: data.postTitle || "It's now visible to the community.",
+        to: data.postId ? `/post/${data.postId}` : null,
+      };
+    }
     case "direct_message": {
       const senderUsername = data.senderUsername || actorName;
       const snippet = data.messageSnippet || "";
