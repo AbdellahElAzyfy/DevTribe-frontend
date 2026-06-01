@@ -77,7 +77,7 @@ export default function ProfilePage() {
 
               <div className="pb-2">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-semibold tracking-tight text-slate-100 sm:text-3xl">
+                  <h1 className="text-2xl font-semibold tracking-tight text-slate-100 break-words sm:text-3xl">
                     @{profile.username}
                   </h1>
                   <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-0.5 text-xs font-medium text-blue-300">

@@ -68,7 +68,7 @@ const ContentRenderer = ({ content }) => {
   // If there are no code blocks, just render text
   if (parts.length === 1 && parts[0].type === 'text') {
     return (
-      <div className="whitespace-pre-wrap">
+      <div className="whitespace-pre-wrap break-words">
         {parts[0].value}
       </div>
     );
@@ -81,7 +81,7 @@ const ContentRenderer = ({ content }) => {
           // trim empty parts
           if (!part.value.trim()) return null;
           return (
-            <p key={index} className="whitespace-pre-wrap">
+            <p key={index} className="whitespace-pre-wrap break-words">
               {part.value.trim()}
             </p>
           );

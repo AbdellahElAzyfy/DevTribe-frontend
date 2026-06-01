@@ -86,17 +86,19 @@ export default function HeaderActions() {
         </>
       ) : (
         <>
-          {/* CREATE POST */}
-          <Button to={"/create-post"} type="primary">
-            Create Post
-          </Button>
+          {/* CREATE POST — desktop/tablet only; mobile uses the bottom nav */}
+          <div className="hidden md:block">
+            <Button to={"/create-post"} type="primary">
+              Create Post
+            </Button>
+          </div>
 
           <button
             type="button"
             onClick={handleLogout}
             disabled={isLoggingOut}
             aria-label="Logout"
-            className="dash-frame inline-flex h-11 w-11 items-center justify-center rounded-lg border-2 border-transparent [--dash-color:rgba(100,116,139,0.48)] bg-slate-800 text-slate-400 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:[--dash-color:rgba(248,113,113,0.55)] hover:bg-slate-700 hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/50 disabled:cursor-not-allowed disabled:opacity-60 sm:h-12 sm:w-12"
+            className="dash-frame hidden h-11 w-11 items-center justify-center rounded-lg border-2 border-transparent [--dash-color:rgba(100,116,139,0.48)] bg-slate-800 text-slate-400 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:[--dash-color:rgba(248,113,113,0.55)] hover:bg-slate-700 hover:text-rose-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/50 disabled:cursor-not-allowed disabled:opacity-60 md:inline-flex md:h-12 md:w-12"
           >
             <HiOutlineArrowLeftOnRectangle className="h-6 w-6" />
           </button>
@@ -104,7 +106,7 @@ export default function HeaderActions() {
           {/* NOTIFICATIONS */}
           <Link
             to="/notifications"
-            className="dash-frame relative inline-flex h-11 w-11 items-center justify-center rounded-lg border-2 border-transparent [--dash-color:rgba(100,116,139,0.48)] bg-slate-800 text-slate-400 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:[--dash-color:rgba(59,130,246,0.55)] hover:bg-slate-700 hover:text-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 sm:h-12 sm:w-12"
+            className="dash-frame relative inline-flex h-10 w-10 items-center justify-center rounded-lg border-2 border-transparent [--dash-color:rgba(100,116,139,0.48)] bg-slate-800 text-slate-400 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:[--dash-color:rgba(59,130,246,0.55)] hover:bg-slate-700 hover:text-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 sm:h-12 sm:w-12"
           >
             <HiOutlineBell className="h-6 w-6" />
 
@@ -115,10 +117,10 @@ export default function HeaderActions() {
             ) : null}
           </Link>
 
-          {/* AVATAR */}
+          {/* AVATAR — desktop/tablet only; mobile uses the bottom nav */}
           <Link
             to="/profile"
-            className="dash-frame inline-flex h-12 w-12 items-center justify-center rounded-full border-2 border-transparent [--dash-color:rgba(100,116,139,0.48)] bg-slate-800 p-1 text-slate-400 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:[--dash-color:rgba(59,130,246,0.55)] hover:bg-slate-700 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 sm:h-13 sm:w-13"
+            className="dash-frame hidden h-13 w-13 items-center justify-center rounded-full border-2 border-transparent [--dash-color:rgba(100,116,139,0.48)] bg-slate-800 p-1 text-slate-400 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:[--dash-color:rgba(59,130,246,0.55)] hover:bg-slate-700 hover:text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 md:inline-flex"
           >
             <img
               src={avatarSrc}

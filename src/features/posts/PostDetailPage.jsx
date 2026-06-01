@@ -159,7 +159,7 @@ export default function PostDetailPage() {
 
         {/* Post Content */}
         <div className="p-4 sm:p-8">
-          <h1 className="mb-6 text-3xl font-extrabold tracking-tight text-slate-100 sm:text-4xl leading-tight">
+          <h1 className="mb-6 text-3xl font-extrabold tracking-tight text-slate-100 sm:text-4xl leading-tight break-words">
             {post.title}
           </h1>
 
@@ -258,8 +258,8 @@ export default function PostDetailPage() {
         </div>
       </div>
 
-      {/* Floating Sticky Bottom Bar (Senior UX) */}
-      <div className="fixed bottom-6 left-1/2 z-50 w-full max-w-[95%] -translate-x-1/2 sm:max-w-2xl">
+      {/* Floating Sticky Bottom Bar (desktop/tablet — mobile uses the bottom nav) */}
+      <div className="fixed bottom-6 left-1/2 z-50 hidden w-full max-w-[95%] -translate-x-1/2 sm:max-w-2xl md:block">
         <div className="flex items-center gap-3 rounded-2xl border border-slate-700/80 bg-slate-900/80 p-2 shadow-2xl shadow-black/60 backdrop-blur-xl ring-1 ring-white/5">
           {/* Vote Group */}
           <div className="flex items-center rounded-xl bg-slate-950/50 p-1 border border-slate-800/50">

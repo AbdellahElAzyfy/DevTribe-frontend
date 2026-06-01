@@ -17,7 +17,7 @@ export default function Logo({ to = "/home", showWordmark = true }) {
           className="h-8 w-8 object-contain transition-transform duration-200 group-hover:scale-105"
         />
         {showWordmark ? (
-          <span className="text-xl font-semibold tracking-tight text-gray-100 transition-colors duration-200 group-hover:text-blue-400">
+          <span className="hidden text-xl font-semibold tracking-tight text-gray-100 transition-colors duration-200 group-hover:text-blue-400 sm:inline">
             {BRAND_NAME}
           </span>
         ) : null}

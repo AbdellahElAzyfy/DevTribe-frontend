@@ -60,7 +60,7 @@ export default function UserProfilePage() {
             <div className="flex-1">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-slate-100">
+                  <h1 className="text-2xl font-bold text-slate-100 break-words">
                     @{user.username}
                   </h1>
                   <div className="mt-1 flex items-center gap-2">

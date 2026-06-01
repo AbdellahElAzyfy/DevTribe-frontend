@@ -143,7 +143,7 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
                 </div>
               </div>
             ) : (
-              <p className="mt-1 text-[13.5px] leading-relaxed text-slate-300 whitespace-pre-wrap">
+              <p className="mt-1 text-[13.5px] leading-relaxed text-slate-300 whitespace-pre-wrap break-words">
                 {comment.content}
               </p>
             )}
@@ -248,7 +248,7 @@ export default function CommentItem({ comment, postId, depth = 0 }) {
           )}
 
           {hasReplies && areRepliesOpen && (
-            <div className="mt-4 space-y-3 border-l-2 border-slate-700/40 pl-4">
+            <div className="mt-4 space-y-3 border-l-2 border-slate-700/40 pl-2 sm:pl-4">
               {replies.map((reply) => (
                 <CommentItem
                   key={reply.id}

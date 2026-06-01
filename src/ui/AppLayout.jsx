@@ -5,6 +5,7 @@ import { closeMobileSidebar, openMobileSidebar } from "../store/uiSlice";
 import Header from "./Header";
 import LeftSidebar from "./LeftSidebar";
 import RightSidebar from "./RightSidebar";
+import BottomNav from "./BottomNav";
 import SocketProvider from "../realtime/SocketProvider";
 
 function AppLayout() {
@@ -47,7 +48,7 @@ function AppLayout() {
             onMobileClose={() => dispatch(closeMobileSidebar())}
           />
 
-          <main className="relative isolate min-w-0 flex-1 overflow-y-auto bg-transparent p-4 sm:p-6">
+          <main className="relative isolate min-w-0 flex-1 overflow-y-auto bg-transparent p-4 pb-28 sm:p-6 sm:pb-28 md:pb-6">
             <div className="relative z-10">
               <Outlet />
             </div>
@@ -55,6 +56,8 @@ function AppLayout() {
 
           <RightSidebar />
         </div>
+
+        <BottomNav />
       </div>
     </SocketProvider>
   );

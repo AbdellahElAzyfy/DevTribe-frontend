@@ -29,7 +29,7 @@ export default function MessageBubble({ message }) {
             : "border border-slate-700/60 bg-slate-800/70 text-slate-100"
         }`}
       >
-        <p className="text-sm leading-relaxed">{message.content}</p>
+        <p className="text-sm leading-relaxed break-words">{message.content}</p>
         <div
           className={`mt-1 flex items-center gap-2 text-xs ${
             isSender ? "text-blue-100" : "text-slate-500"

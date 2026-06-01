@@ -3,7 +3,7 @@ import ContentRenderer from "../../../ui/ContentRenderer";
 function PostCardBody({ title, content, imageUrl, tags }) {
   return (
     <>
-      <h2 className="text-xl font-semibold tracking-tight text-slate-100 transition-all duration-300 ease-out group-hover:text-blue-400">
+      <h2 className="text-xl font-semibold tracking-tight text-slate-100 break-words transition-all duration-300 ease-out group-hover:text-blue-400">
         {title}
       </h2>
 

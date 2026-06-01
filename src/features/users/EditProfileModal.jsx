@@ -237,7 +237,7 @@ export default function EditProfileModal({
 
       {/* Modal */}
       <div className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-900 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)]">
-        <div className="flex items-center justify-between border-b border-slate-800 bg-slate-800/30 px-8 py-5">
+        <div className="flex items-center justify-between border-b border-slate-800 bg-slate-800/30 px-5 py-4 sm:px-8 sm:py-5">
           <h2 className="text-xl font-black uppercase tracking-tight text-slate-100">
             Account Settings
           </h2>
@@ -251,7 +251,7 @@ export default function EditProfileModal({
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-slate-800 bg-slate-900/60 px-8 py-3">
+        <div className="flex gap-1 border-b border-slate-800 bg-slate-900/60 px-5 py-3 sm:px-8">
           <TabButton
             active={activeTab === "profile"}
             onClick={() => setActiveTab("profile")}
@@ -267,7 +267,7 @@ export default function EditProfileModal({
         </div>
 
         {activeTab === "profile" ? (
-          <form onSubmit={handleProfileSubmit} className="space-y-4 p-8">
+          <form onSubmit={handleProfileSubmit} className="space-y-4 p-5 sm:p-8">
             {/* Avatar */}
             <div className="flex items-center gap-4">
               <img
@@ -396,7 +396,7 @@ export default function EditProfileModal({
             </div>
           </form>
         ) : (
-          <form onSubmit={handlePasswordSubmit} className="space-y-4 p-8">
+          <form onSubmit={handlePasswordSubmit} className="space-y-4 p-5 sm:p-8">
             {/* Current password */}
             <div>
               <label

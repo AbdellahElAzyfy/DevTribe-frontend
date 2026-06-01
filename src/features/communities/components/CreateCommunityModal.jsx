@@ -25,7 +25,7 @@ export default function CreateCommunityModal({ isOpen, onClose, communityToEdit 
       
       {/* Modal Content */}
       <div className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-slate-700/50 bg-slate-900 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)] animate-in zoom-in-95 fade-in duration-300">
-        <div className="flex items-center justify-between border-b border-slate-800 bg-slate-800/30 px-8 py-5">
+        <div className="flex items-center justify-between border-b border-slate-800 bg-slate-800/30 px-5 py-4 sm:px-8 sm:py-5">
           <h2 className="text-xl font-black text-slate-100 uppercase tracking-tight">
             {communityToEdit ? "Modify Community" : "Establish Community"}
           </h2>
@@ -37,7 +37,7 @@ export default function CreateCommunityModal({ isOpen, onClose, communityToEdit 
           </button>
         </div>
         
-        <div className="p-8">
+        <div className="p-5 sm:p-8">
           <CreateCommunityForm 
             onSuccess={onClose} 
             initialData={communityToEdit} 
