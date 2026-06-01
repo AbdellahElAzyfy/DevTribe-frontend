@@ -24,7 +24,7 @@ function AppLayout() {
 
   return (
     <SocketProvider>
-      <div className="relative flex h-screen flex-col bg-[#0b1120]">
+      <div className="relative flex h-dvh flex-col bg-[#0b1120]">
         <Header onMobileMenuToggle={() => dispatch(openMobileSidebar())} />
         <div className="pointer-events-none fixed inset-x-0 top-16 bottom-0 z-0 overflow-hidden">
           <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(112deg,rgba(148,163,184,0.16)_0px,rgba(148,163,184,0.16)_1px,transparent_1px,transparent_84px)] sm:bg-[repeating-linear-gradient(112deg,rgba(148,163,184,0.16)_0px,rgba(148,163,184,0.16)_1px,transparent_1px,transparent_56px)]" />

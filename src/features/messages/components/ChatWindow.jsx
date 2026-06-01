@@ -117,12 +117,12 @@ export default function ChatWindow({ userId }) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 rounded-lg border border-slate-700/60 bg-slate-900/70 px-4 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-400/50 focus:outline-none"
+            className="h-10 flex-1 rounded-lg border border-slate-700/60 bg-slate-900/70 px-4 text-sm text-slate-100 placeholder-slate-500 focus:border-blue-400/50 focus:outline-none"
           />
           <button
             type="submit"
             disabled={!content.trim() || sendMessage.isPending}
-            className="rounded-lg bg-blue-500 px-6 py-2 text-sm font-semibold text-white hover:bg-blue-600 disabled:opacity-50"
+            className="h-10 shrink-0 rounded-lg bg-blue-500 px-5 text-sm font-semibold text-white hover:bg-blue-600 disabled:opacity-50"
           >
             Send
           </button>
