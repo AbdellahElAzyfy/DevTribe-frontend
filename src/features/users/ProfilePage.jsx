@@ -68,15 +68,15 @@ export default function ProfilePage() {
 
         <div className="p-5 sm:p-6">
           <div className="-mt-14 flex flex-wrap items-end justify-between gap-4 sm:-mt-16">
-            <div className="flex items-end gap-4">
+            <div className="flex min-w-0 items-end gap-4">
               <img
                 src={avatarSrc}
                 alt={profile.username}
                 className="h-24 w-24 rounded-2xl border-4 border-[#0b1120] object-cover shadow-lg shadow-black/40 sm:h-28 sm:w-28"
               />
 
-              <div className="pb-2">
-                <div className="flex items-center gap-2">
+              <div className="min-w-0 pb-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-2xl font-semibold tracking-tight text-slate-100 break-words sm:text-3xl">
                     @{profile.username}
                   </h1>
@@ -84,7 +84,7 @@ export default function ProfilePage() {
                     {roleLabel}
                   </span>
                 </div>
-                <p className="mt-1 text-sm text-slate-400">{profile.email}</p>
+                <p className="mt-1 text-sm text-slate-400 break-words">{profile.email}</p>
               </div>
             </div>
 

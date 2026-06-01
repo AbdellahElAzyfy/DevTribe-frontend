@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { closeMobileSidebar, openMobileSidebar } from "../store/uiSlice";
 import Header from "./Header";
 import LeftSidebar from "./LeftSidebar";
@@ -10,9 +10,14 @@ import SocketProvider from "../realtime/SocketProvider";
 
 function AppLayout() {
   const dispatch = useDispatch();
+  const { pathname } = useLocation();
   const isMobileSidebarOpen = useSelector(
     (state) => state.ui.isMobileSidebarOpen,
   );
+
+  // Inside an individual conversation (/messages/:userId) the mobile bottom bar
+  // hides — like Telegram/WhatsApp — so the chat input owns the bottom edge.
+  const isChatRoute = /^\/messages\/[^/]+/.test(pathname);
 
   useEffect(() => {
     document.body.style.overflow = isMobileSidebarOpen ? "hidden" : "";
@@ -48,7 +53,11 @@ function AppLayout() {
             onMobileClose={() => dispatch(closeMobileSidebar())}
           />
 
-          <main className="relative isolate min-w-0 flex-1 overflow-y-auto bg-transparent p-4 pb-28 sm:p-6 sm:pb-28 md:pb-6">
+          <main
+            className={`relative isolate min-w-0 flex-1 overflow-y-auto bg-transparent p-4 sm:p-6 ${
+              isChatRoute ? "" : "pb-28 sm:pb-28 md:pb-6"
+            }`}
+          >
             <div className="relative z-10">
               <Outlet />
             </div>
@@ -57,7 +66,7 @@ function AppLayout() {
           <RightSidebar />
         </div>
 
-        <BottomNav />
+        {isChatRoute ? null : <BottomNav />}
       </div>
     </SocketProvider>
   );

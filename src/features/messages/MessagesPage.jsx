@@ -11,11 +11,11 @@ export default function MessagesPage() {
   // and selecting a conversation swaps the whole pane for the chat window
   // (which renders its own back button to return here).
   if (userId) {
-    // Fill the main content area exactly. The layout's <main> already supplies
-    // matching top/bottom padding, so we only subtract the header (4rem) + that
-    // padding: 3rem on desktop, and the mobile bottom-nav allowance below md.
+    // Fill the main content area exactly. Inside a conversation the bottom nav is
+    // hidden, so we only subtract the header (4rem) + <main>'s padding: 2rem on
+    // mobile (p-4) and 3rem from sm up (p-6 / md:pb-6).
     return (
-      <div className="mx-auto w-full max-w-3xl h-[calc(100dvh-12rem)] md:h-[calc(100vh-7rem)]">
+      <div className="mx-auto w-full max-w-3xl h-[calc(100dvh-6rem)] sm:h-[calc(100dvh-7rem)] md:h-[calc(100vh-7rem)]">
         <ChatWindow userId={userId} />
       </div>
     );

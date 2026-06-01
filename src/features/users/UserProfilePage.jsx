@@ -51,19 +51,19 @@ export default function UserProfilePage() {
       <div className="space-y-6">
         {/* Profile Header */}
         <div className="rounded-xl border border-slate-700/70 bg-slate-900/55 p-6 shadow-lg shadow-black/15">
-          <div className="flex items-start gap-6">
+          <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:gap-6 sm:text-left">
             <img
               src={avatarSrc}
               alt={user.username}
               className="h-24 w-24 shrink-0 rounded-full border-2 border-slate-700/70 object-cover"
             />
-            <div className="flex-1">
-              <div className="flex items-start justify-between gap-4">
-                <div>
+            <div className="w-full min-w-0 sm:flex-1">
+              <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                <div className="min-w-0">
                   <h1 className="text-2xl font-bold text-slate-100 break-words">
                     @{user.username}
                   </h1>
-                  <div className="mt-1 flex items-center gap-2">
+                  <div className="mt-1 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                     <span
                       className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
                         user.role === "admin"
@@ -83,7 +83,7 @@ export default function UserProfilePage() {
                 {!isOwnProfile && (
                   <button
                     onClick={() => navigate(`/messages/${user._id}`)}
-                    className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600"
+                    className="flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-600 sm:w-auto"
                   >
                     <HiChatBubbleLeftRight className="h-4 w-4" />
                     Send Message
@@ -95,7 +95,7 @@ export default function UserProfilePage() {
                   {user.bio}
                 </p>
               )}
-              <div className="mt-4 flex gap-6 text-sm">
+              <div className="mt-4 flex justify-center gap-6 text-sm sm:justify-start">
                 <div>
                   <span className="font-semibold text-slate-100">
                     {stats.postCount}
