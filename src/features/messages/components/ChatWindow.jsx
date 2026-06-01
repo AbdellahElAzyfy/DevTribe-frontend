@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useConversation, useSendMessage, useMarkConversationRead } from "../../../hooks/useMessageQueries";
 import { useAuth } from "../../../hooks/useAuth";
 import MessageBubble from "./MessageBubble";
@@ -9,8 +10,34 @@ export default function ChatWindow({ userId }) {
   const sendMessage = useSendMessage();
   const markRead = useMarkConversationRead();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [content, setContent] = useState("");
   const messagesEndRef = useRef(null);
+
+  const goBack = () => navigate("/messages");
+
+  const backButton = (
+    <button
+      type="button"
+      onClick={goBack}
+      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-300 transition hover:bg-slate-800 hover:text-white"
+      aria-label="Back to conversations"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-5 w-5"
+      >
+        <path d="M19 12H5" />
+        <path d="M12 19l-7-7 7-7" />
+      </svg>
+    </button>
+  );
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -43,23 +70,34 @@ export default function ChatWindow({ userId }) {
 
   if (isLoading) {
     return (
-      <div className="flex h-full items-center justify-center rounded-xl border border-slate-700/60 bg-slate-900/50">
-        <AsyncStateNotice state="loading" message="Loading messages..." />
+      <div className="flex h-full flex-col rounded-xl border border-slate-700/60 bg-slate-900/50">
+        <div className="flex items-center gap-2 border-b border-slate-700/60 p-4">
+          {backButton}
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <AsyncStateNotice state="loading" message="Loading messages..." />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center rounded-xl border border-slate-700/60 bg-slate-900/50">
-        <AsyncStateNotice state="error" message={error.message || "Failed to load conversation"} />
+      <div className="flex h-full flex-col rounded-xl border border-slate-700/60 bg-slate-900/50">
+        <div className="flex items-center gap-2 border-b border-slate-700/60 p-4">
+          {backButton}
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <AsyncStateNotice state="error" message={error.message || "Failed to load conversation"} />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex h-full flex-col rounded-xl border border-slate-700/60 bg-slate-900/50 shadow-lg shadow-black/15">
-      <div className="border-b border-slate-700/60 p-4">
+      <div className="flex items-center gap-3 border-b border-slate-700/60 p-4">
+        {backButton}
         <h2 className="text-lg font-semibold text-slate-100">
           @{data?.otherUser?.username}
         </h2>
