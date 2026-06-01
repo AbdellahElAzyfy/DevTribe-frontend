@@ -34,10 +34,6 @@ function SidebarManageSection({ joinedCommunities, onNavigate }) {
           ))}
         </div>
       ) : null}
-
-      <p className="px-1 text-[11px] text-slate-500">
-        Moderation tools will be connected after backend integration.
-      </p>
     </div>
   );
 }

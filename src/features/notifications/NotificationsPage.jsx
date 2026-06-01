@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import NotificationItem from "./NotificationItem";
 import { useNotificationsQuery } from "./useNotificationsQuery";
+import { useMarkAllNotificationsRead } from "./useMarkAllNotificationsRead";
 import AsyncStateNotice from "../../ui/AsyncStateNotice";
 import SimpleList from "../../ui/SimpleList";
 import PageHeaderBlock from "../../ui/PageHeaderBlock";
@@ -11,6 +13,16 @@ export default function NotificationsPage() {
     isLoading,
     isError,
   } = useNotificationsQuery();
+
+  const markAllRead = useMarkAllNotificationsRead();
+  const mutate = markAllRead.mutate;
+
+  useEffect(() => {
+    if (isLoading) return;
+    const hasUnread = notifications.some((n) => !n.isRead);
+    if (!hasUnread) return;
+    mutate();
+  }, [isLoading, notifications, mutate]);
 
   if (isLoading) {
     return (

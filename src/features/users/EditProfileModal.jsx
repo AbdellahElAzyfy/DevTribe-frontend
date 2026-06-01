@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FaTimes } from "react-icons/fa";
 
-import { useUpdateProfile, useChangePassword } from "../../hooks/useAuthQueries";
+import {
+  useUpdateProfile,
+  useChangePassword,
+} from "../../hooks/useAuthQueries";
 import { authInputClassName, authSubmitClassName } from "../auth/authStyles";
 import resolveImageUrl from "../../utils/resolveImageUrl";
 
@@ -67,7 +70,12 @@ function TabButton({ active, onClick, children }) {
   );
 }
 
-export default function EditProfileModal({ isOpen, onClose, profile, onUpdated }) {
+export default function EditProfileModal({
+  isOpen,
+  onClose,
+  profile,
+  onUpdated,
+}) {
   const updateProfile = useUpdateProfile();
   const changePassword = useChangePassword();
 
@@ -292,7 +300,10 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdated }
 
             {/* Username */}
             <div>
-              <label className="text-sm font-medium text-slate-300" htmlFor="edit-username">
+              <label
+                className="text-sm font-medium text-slate-300"
+                htmlFor="edit-username"
+              >
                 Username
               </label>
               <input
@@ -305,13 +316,18 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdated }
                 }`}
               />
               {profileErrors.username ? (
-                <p className="mt-1 text-sm text-red-400">{profileErrors.username}</p>
+                <p className="mt-1 text-sm text-red-400">
+                  {profileErrors.username}
+                </p>
               ) : null}
             </div>
 
             {/* Email */}
             <div>
-              <label className="text-sm font-medium text-slate-300" htmlFor="edit-email">
+              <label
+                className="text-sm font-medium text-slate-300"
+                htmlFor="edit-email"
+              >
                 Email
               </label>
               <input
@@ -324,14 +340,19 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdated }
                 }`}
               />
               {profileErrors.email ? (
-                <p className="mt-1 text-sm text-red-400">{profileErrors.email}</p>
+                <p className="mt-1 text-sm text-red-400">
+                  {profileErrors.email}
+                </p>
               ) : null}
             </div>
 
             {/* Bio */}
             <div>
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-slate-300" htmlFor="edit-bio">
+                <label
+                  className="text-sm font-medium text-slate-300"
+                  htmlFor="edit-bio"
+                >
                   Bio
                 </label>
                 <span className="text-xs text-slate-500">
@@ -361,7 +382,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdated }
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-700/70 bg-slate-800/70 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-700"
+                className={`${authSubmitClassName} mt-0 flex-1`}
               >
                 Cancel
               </button>
@@ -466,7 +487,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onUpdated }
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex flex-1 items-center justify-center rounded-lg border border-slate-700/70 bg-slate-800/70 px-4 py-2.5 text-sm font-medium text-slate-200 transition hover:bg-slate-700"
+                className={`${authSubmitClassName} mt-0 flex-1`}
               >
                 Cancel
               </button>
