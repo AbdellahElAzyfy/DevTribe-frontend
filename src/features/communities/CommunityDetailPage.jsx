@@ -16,19 +16,28 @@ export default function CommunityDetailPage() {
   const { id: slug } = useParams();
   
   // Use the specific community query which now includes isJoined status
-  const { data: community, isLoading: communityLoading } = useCommunityQuery(slug);
+  const {
+    data: community,
+    isLoading: communityLoading,
+    isError: communityError,
+  } = useCommunityQuery(slug);
 
+  // Posts are gated separately: viewing a private community you haven't joined
+  // returns the community itself, but its posts are forbidden (403). That must
+  // NOT fail the whole page — we still show the community header + join button.
   const {
     data: communityPosts = [],
     isLoading: postsLoading,
-    isError,
+    isError: postsError,
   } = useCommunityPostsQuery(slug);
-  
+
   const { mutate: join, isLoading: isJoining } = useJoinCommunity();
   const { mutate: leave, isLoading: isLeaving } = useLeaveCommunity();
   const isPending = isJoining || isLeaving;
 
-  if (communityLoading || postsLoading) {
+  // Only the community query gates the page. The posts query has its own
+  // inline loading/error/empty states below.
+  if (communityLoading) {
     return (
       <AsyncStateNotice
         message="Loading community details..."
@@ -37,7 +46,7 @@ export default function CommunityDetailPage() {
     );
   }
 
-  if (isError || !community) {
+  if (communityError || !community) {
     return (
       <AsyncStateNotice
         message="Community not found or failed to load."
@@ -46,6 +55,8 @@ export default function CommunityDetailPage() {
       />
     );
   }
+
+  const isLockedPrivate = community.isPrivate && !community.isJoined;
 
   const handleToggleJoin = () => {
     if (community.isJoined) {
@@ -101,12 +112,29 @@ export default function CommunityDetailPage() {
 
       <NewPostsBanner listKey={queryKeys.posts.list({ community: slug })} />
 
-      <SimpleList
-        items={communityPosts}
-        className="space-y-4"
-        getKey={(post) => post.id}
-        renderItem={(post) => <PostCard post={post} />}
-      />
+      {isLockedPrivate || postsError ? (
+        <div className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-8 text-center">
+          <p className="text-base font-semibold text-slate-200">
+            {isLockedPrivate
+              ? "This is a private community"
+              : "Posts couldn't be loaded"}
+          </p>
+          <p className="mt-2 text-sm text-slate-400">
+            {isLockedPrivate
+              ? "Join this community to see and create posts."
+              : "Something went wrong loading posts. Please try again later."}
+          </p>
+        </div>
+      ) : postsLoading ? (
+        <AsyncStateNotice message="Loading posts..." maxWidth="max-w-4xl" />
+      ) : (
+        <SimpleList
+          items={communityPosts}
+          className="space-y-4"
+          getKey={(post) => post.id}
+          renderItem={(post) => <PostCard post={post} />}
+        />
+      )}
     </PageShell>
   );
 }
