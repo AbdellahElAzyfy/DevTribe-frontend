@@ -1,3 +1,1 @@
 # DevTribe Frontend
-
-DevTribe
